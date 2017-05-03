@@ -76,6 +76,10 @@ public class Background extends JPanel {
         super.add(component, constraints);
     }
 
+    public void addOpaque(JComponent component, Object constraints) {
+        super.add(component, constraints);
+    }
+
     public void setTransparentAdd(boolean isTransparent) {
         this.isTransparent = isTransparent;
     }

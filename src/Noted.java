@@ -8,7 +8,7 @@ public class Noted {
     public static void main(String args[]) {
         try {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
-            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Test");
+            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Noted");
             System.setProperty("awt.useSystemAAFontSettings", "on");
             System.setProperty("swing.aatext", "true");
 
@@ -17,12 +17,9 @@ public class Noted {
             e.printStackTrace();
         }
 
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                Window w = new Window();
-                w.setVisible(true);
-            }
+        EventQueue.invokeLater(() -> {
+            Window w = new Window();
+            w.setVisible(true);
         });
     }
 }

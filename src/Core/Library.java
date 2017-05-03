@@ -11,20 +11,18 @@ import java.util.List;
  */
 public class Library {
     private static Library instance = null;
+    private static ArrayList<Notebook> notebooks = new ArrayList<>();
+    private final String HOME = "A:\\Docs\\Programming\\Noted";
+
+    private Library() {
+        populate();
+    }
 
     public static Library getInstance() {
         if (instance == null) {
             instance = new Library();
         }
         return instance;
-    }
-
-    private final String HOME = "A:\\Docs\\Programming\\Noted";
-
-    private static ArrayList<Notebook> notebooks = new ArrayList<>();
-
-    private Library() {
-        populate();
     }
 
     private void populate() {

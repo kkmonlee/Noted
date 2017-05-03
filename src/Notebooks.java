@@ -15,8 +15,6 @@ public class Notebooks extends Background {
 
     private static final long serialVersionUID = 1789204685570992009L;
     private static Image tile, notebookBg, notebookBgSelected;
-    private Window window;
-    private NotebookItem selectedNotebook;
 
     static {
         try {
@@ -28,14 +26,16 @@ public class Notebooks extends Background {
         }
     }
 
+    private Window window;
+    private NotebookItem selectedNotebook;
+    private JPanel main;
+
     public Notebooks(Window w) {
         super(tile);
         window = w;
         createComponents();
         update();
     }
-
-    private JPanel main;
 
     private void createComponents() {
         main = new JPanel();

@@ -1,12 +1,15 @@
-import Core.Notebook;
 import Core.Note;
+import Core.Notebook;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,21 +18,28 @@ import java.util.List;
 public class NoteList extends Background {
 
     private static final long serialVersionUID = 3048147426769410426L;
-    private static Image tile;
-    private JPanel main;
-
-    final private Color colorNoteBorder = Color.decode("#e2e2e2");
+    private static Image tile, noteShadow, noteSelection;
 
     static {
         try {
             tile = ImageIO.read(Sidebar.class.getClass().getResourceAsStream("/images/notelist.png"));
+            noteSelection = ImageIO.read(Sidebar.class.getClass().getResourceAsStream("/images/noteShadow.png"));
+            noteSelection = ImageIO.read(Sidebar.class.getClass().getResourceAsStream("/images/noteSelection.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public NoteList() {
+    final private Color colorNoteBorder = Color.decode("#cdcdcd");
+    private JPanel main;
+    private Window window;
+    private Notebook notebook;
+    private NoteItem selectedNote;
+    private ArrayList<NoteItem> noteItems = new ArrayList<>();
+
+    public NoteList(Window w) {
         super(tile);
+        window = w;
         createComponents();
     }
 
@@ -37,10 +47,43 @@ public class NoteList extends Background {
         main = new JPanel();
         main.setLayout(null);
         add(main);
+
+        main.addMouseListener(new CustomMouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                window.onNoteListClicked(e);
+            }
+        });
+
+        main.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_UP:
+                        changeSelection(-1);
+                        break;
+                    case KeyEvent.VK_DOWN:
+                        changeSelection(1);
+                        break;
+                }
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                System.out.println("keyPressed " + e.toString());
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
+        });
     }
 
     public void load(Notebook notebook) {
+        this.notebook = notebook;
+
         main.removeAll();
+        noteItems.clear();
 
         Insets insets = main.getInsets();
         Dimension size;
@@ -51,6 +94,7 @@ public class NoteList extends Background {
         for (Note n : list) {
             NoteItem item = new NoteItem(n);
             main.add(item);
+            noteItems.add(item);
 
             size = item.getPreferredSize();
             item.setBounds(12 + insets.left, y + insets.top, size.width, size.height);
@@ -58,10 +102,60 @@ public class NoteList extends Background {
         }
     }
 
+    public void changeSelection(int delta) {
+        int len = main.getComponentCount();
+        int select = -1;
+
+        if (selectedNote == null) {
+            if (len > 0) {
+                if (delta < 0) {
+                    select = len - 1;
+                } else {
+                    select = 0;
+                }
+            }
+        } else {
+            int currentIndex = noteItems.indexOf(selectedNote);
+            select = currentIndex + delta;
+        }
+
+        if (select >= 0 && select < len) {
+            deselectAll();
+
+            NoteItem noteItem = noteItems.get(select);
+            noteItem.setSelected(true);
+            selectedNote = noteItem;
+            window.showNote(noteItem.note);
+        }
+    }
+
     private void deselectAll() {
-        for (int n = 0, len = main.getComponentCount(); n < len; n++) {
-            NoteItem i = (NoteItem) main.getComponent(n);
+        for (NoteItem i : noteItems) {
             i.setSelected(false);
+        }
+    }
+
+    public void unfocusEditor() {
+        if (selectedNote != null) {
+            selectedNote.requestFocusInWindow();
+        }
+    }
+
+    public void newNote() {
+        try {
+            Note newNote = notebook.newNote();
+            load(notebook);
+            window.showNote(newNote);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateThumb(Note note) {
+        for (NoteItem item : noteItems) {
+            if (item.note == note) {
+                item.updateThumb();
+            }
         }
     }
 
@@ -69,8 +163,10 @@ public class NoteList extends Background {
 
         private static final long serialVersionUID = 3619164083899104160L;
         private Note note;
-        private Dimension size = new Dimension(182, 182);
+        private Dimension size = new Dimension(196, 196);
         private JLabel name;
+        private JTextArea preview;
+        private Background root;
 
         public NoteItem(Note n) {
             super();
@@ -78,23 +174,61 @@ public class NoteList extends Background {
 
             setLayout(new BorderLayout());
 
+            root = new Background(noteShadow, 2);
+            root.setBorder(BorderFactory.createEmptyBorder(7, 7, 7, 7));
+            root.setMinimumSize(size);
+            root.setMaximumSize(size);
+
             JPanel p = new JPanel();
             p.setLayout(new BorderLayout());
             p.setBackground(Color.WHITE);
             p.setBorder(BorderFactory.createLineBorder(colorNoteBorder, 1));
-            p.setMinimumSize(size);
-            p.setMaximumSize(size);
 
-            name = new JLabel(n.name());
+            name = new JLabel(n.getMeta().title());
+            name.setFont(Window.fontH1);
             name.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
             p.add(name, BorderLayout.NORTH);
 
-            add(p, BorderLayout.CENTER);
+            JPanel previewPane = new JPanel();
+            previewPane.setBorder(BorderFactory.createEmptyBorder(0, 12, 12, 12));
+            previewPane.setLayout(new GridLayout(1, 1));
+            previewPane.setBackground(Color.WHITE);
+
+            preview = new JTextArea();
+            preview.setEditable(false);
+            preview.setFont(Window.fontSmall);
+            preview.setText(getContentPreview());
+            preview.setBackground(Color.WHITE);
+
+            previewPane.add(preview);
+
+            p.add(previewPane, BorderLayout.CENTER);
+
+            root.addOpaque(p, BorderLayout.CENTER);
+            add(root, BorderLayout.CENTER);
 
             p.addMouseListener(this);
+            preview.addMouseListener(this);
+        }
+
+        private String getContentPreview() {
+            String contents = note.contents();
+            if (contents.length() > 200) {
+                contents = contents.substring(0, 200) + "...";
+            }
+            return contents;
+        }
+
+        public void updateThumb() {
+            name.setText(note.getMeta().title());
+            preview.setText(getContentPreview());
         }
 
         public void setSelected(boolean b) {
+            if (b)
+                root.setImage(noteSelection);
+            else
+                root.setImage(noteShadow);
             repaint();
         }
 
@@ -117,6 +251,13 @@ public class NoteList extends Background {
         public void mouseClicked(MouseEvent e) {
             deselectAll();
             setSelected(true);
+
+            if (e.getClickCount() == 1) {
+                selectedNote = NoteItem.this;
+                window.showNote(note);
+
+                System.out.println("B " + preview.getBounds());
+            }
         }
 
         @Override
