@@ -7,13 +7,13 @@ import java.util.List;
 /**
  * Created by aa on 03 May 2017.
  */
-public class Book {
+public class Notebook {
     private String name;
     private File folder;
 
     public ArrayList<Note> notes = new ArrayList<>();
 
-    public Book(File folder) {
+    public Notebook(File folder) {
         this.name = folder.getName();
         this.folder = folder;
         populate();

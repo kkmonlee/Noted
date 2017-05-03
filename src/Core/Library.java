@@ -3,7 +3,6 @@ package Core;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class Library {
 
     private final String HOME = "A:\\Docs\\Programming\\Noted";
 
-    private static ArrayList<Book> books = new ArrayList<>();
+    private static ArrayList<Notebook> notebooks = new ArrayList<>();
 
     private Library() {
         populate();
@@ -33,14 +32,14 @@ public class Library {
 
         for (File f : home.listFiles()) {
             if (Files.isDirectory(f.toPath())) {
-                books.add(new Book(f));
+                notebooks.add(new Notebook(f));
             }
         }
 
-        books.sort(Comparator.comparing(o -> o.name().toLowerCase()));
+        notebooks.sort(Comparator.comparing(o -> o.name().toLowerCase()));
     }
 
-    public List<Book> getBooks() {
-        return books;
+    public List<Notebook> getBooks() {
+        return notebooks;
     }
 }
