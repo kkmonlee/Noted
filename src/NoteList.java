@@ -4,8 +4,6 @@ import Core.Notebook;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
@@ -23,7 +21,7 @@ public class NoteList extends Background {
     static {
         try {
             tile = ImageIO.read(Sidebar.class.getClass().getResourceAsStream("/images/notelist.png"));
-            noteSelection = ImageIO.read(Sidebar.class.getClass().getResourceAsStream("/images/noteShadow.png"));
+            noteShadow = ImageIO.read(Sidebar.class.getClass().getResourceAsStream("/images/noteShadow.png"));
             noteSelection = ImageIO.read(Sidebar.class.getClass().getResourceAsStream("/images/noteSelection.png"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -52,29 +50,6 @@ public class NoteList extends Background {
             @Override
             public void mouseClicked(MouseEvent e) {
                 window.onNoteListClicked(e);
-            }
-        });
-
-        main.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_UP:
-                        changeSelection(-1);
-                        break;
-                    case KeyEvent.VK_DOWN:
-                        changeSelection(1);
-                        break;
-                }
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                System.out.println("keyPressed " + e.toString());
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
             }
         });
     }
@@ -145,6 +120,7 @@ public class NoteList extends Background {
         try {
             Note newNote = notebook.newNote();
             load(notebook);
+            selectNote(newNote);
             window.showNote(newNote);
         } catch (IOException e) {
             e.printStackTrace();
@@ -155,6 +131,17 @@ public class NoteList extends Background {
         for (NoteItem item : noteItems) {
             if (item.note == note) {
                 item.updateThumb();
+            }
+        }
+    }
+
+    private void selectNote(Note n) {
+        deselectAll();
+        for (NoteItem i : noteItems) {
+            if (i.note == n) {
+                i.setSelected(true);
+                selectedNote = i;
+                return;
             }
         }
     }
@@ -255,8 +242,6 @@ public class NoteList extends Background {
             if (e.getClickCount() == 1) {
                 selectedNote = NoteItem.this;
                 window.showNote(note);
-
-                System.out.println("B " + preview.getBounds());
             }
         }
 

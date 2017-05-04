@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * Created by aa on 03 May 2017.
  */
-public class NoteEditor extends Background {
+public class NoteEditor extends Background implements CustomEditor.EditorEventListener {
 
     private static final long serialVersionUID = 5226641103819463968L;
     private static Image tile;
@@ -99,7 +99,6 @@ public class NoteEditor extends Background {
     }
 
     public void unfocus() {
-        saveChanges();
         window.unfocusedEditor();
     }
 
@@ -129,5 +128,14 @@ public class NoteEditor extends Background {
                 window.updateThumb(currentNote);
             }
         }
+    }
+
+    public void focusTitle() {
+        editor.focusTitle();
+    }
+
+    @Override
+    public void editingFocusLost() {
+        saveChanges();
     }
 }

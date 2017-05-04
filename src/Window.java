@@ -87,6 +87,7 @@ public class Window extends JFrame {
 
     public void newNote() {
         noteList.newNote();
+        focusEditor();
     }
 
     private void createMenu() {
@@ -188,6 +189,10 @@ public class Window extends JFrame {
             }
             return false;
         }
+    }
+
+    public void focusEditor() {
+        noteEditor.focusTitle();
     }
 
 }
