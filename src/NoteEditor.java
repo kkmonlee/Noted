@@ -105,6 +105,7 @@ public class NoteEditor extends Background implements CustomEditor.EditorEventLi
     private void saveChanges() {
         if (currentNote != null) {
             boolean changed = false;
+            boolean contentChanged = false;
 
             try {
                 String fileTitle = currentNote.getMeta().title();
@@ -119,6 +120,7 @@ public class NoteEditor extends Background implements CustomEditor.EditorEventLi
                 if (!fileText.equals(editedText)) {
                     currentNote.save(editedText);
                     changed = true;
+                    contentChanged = true;
                 }
             } catch (BadLocationException e) {
                 e.printStackTrace();
@@ -126,6 +128,9 @@ public class NoteEditor extends Background implements CustomEditor.EditorEventLi
 
             if (changed) {
                 window.updateThumb(currentNote);
+                if (contentChanged) {
+                    window.sortAndUpdate();
+                }
             }
         }
     }

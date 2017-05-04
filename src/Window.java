@@ -225,4 +225,8 @@ public class Window extends JFrame {
         noteEditor.focusTitle();
     }
 
+    public void sortAndUpdate() {
+        noteList.sortAndUpdate();
+    }
+
 }

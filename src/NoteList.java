@@ -226,12 +226,14 @@ public class NoteList extends Background {
         for (NoteItem item : noteItems) {
             if (item.note == note) {
                 item.updateThumb();
-                notebook.sortNotes();
-                load(notebook);
-                selectNote(item);
                 return;
             }
         }
+    }
+
+    public void sortAndUpdate() {
+        notebook.sortNotes();
+        window.showNotebook(notebook);
     }
 
     private void selectNote(Note n) {
