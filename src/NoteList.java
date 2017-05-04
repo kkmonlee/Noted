@@ -4,11 +4,15 @@ import Core.Notebook;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.pushingpixels.trident.Timeline;
 
 /**
  * Created by aa on 03 May 2017.
@@ -34,6 +38,7 @@ public class NoteList extends Background {
     private Notebook notebook;
     private NoteItem selectedNote;
     private ArrayList<NoteItem> noteItems = new ArrayList<>();
+    private JScrollPane scroll;
 
     public NoteList(Window w) {
         super(tile);
@@ -44,12 +49,24 @@ public class NoteList extends Background {
     private void createComponents() {
         main = new JPanel();
         main.setLayout(null);
-        add(main);
+
+        scroll = new JScrollPane(main);
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.setBorder(Window.emptyBorder);
+
+        add(scroll);
 
         main.addMouseListener(new CustomMouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 window.onNoteListClicked(e);
+            }
+        });
+
+        main.addComponentListener(new ResizeListener() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                layoutItems();
             }
         });
     }
@@ -60,26 +77,86 @@ public class NoteList extends Background {
         main.removeAll();
         noteItems.clear();
 
-        Insets insets = main.getInsets();
-        Dimension size;
-        int y = 12;
-
         List<Note> list = notebook.getNotes();
-
         for (Note n : list) {
             NoteItem item = new NoteItem(n);
             main.add(item);
             noteItems.add(item);
+        }
 
+        layoutItems();
+    }
+
+    int itemsPerRow;
+
+    private void layoutItems() {
+        Insets insets = main.getInsets();
+        Dimension size = new Dimension(192, 192);
+        int x = 6;
+        int y = 12;
+
+        Rectangle mainBounds = main.getBounds();
+
+        int itemAtRow = 0;
+        for (NoteItem item : noteItems) {
             size = item.getPreferredSize();
-            item.setBounds(12 + insets.left, y + insets.top, size.width, size.height);
-            y += size.height;
+
+            itemsPerRow = mainBounds.width / size.width;
+            int extra = mainBounds.width - (size.width * itemsPerRow);
+            extra /= 2;
+
+            int linedX = x + insets.left + (itemAtRow * size.width);
+            if (itemsPerRow > 0) {
+                int add = extra / itemsPerRow;
+                linedX += (itemAtRow + 1) * add;
+            }
+
+            item.setBounds(linedX, y + insets.top, size.width, size.height);
+
+            if (itemAtRow < itemsPerRow -1) {
+                itemAtRow++;
+            } else {
+                y += size.height;
+                itemAtRow = 0;
+            }
+        }
+
+        Dimension d = main.getPreferredSize();
+        d.height = y + 12;
+        main.setPreferredSize(d);
+    }
+
+    private void selectNote(NoteItem item) {
+        selectedNote = item;
+        item.setSelected(true);
+
+        Rectangle b = item.getBounds();
+        int itemY = b.y;
+        int y = scroll.getVerticalScrollBar().getValue();
+        int scrollHeight = scroll.getBounds().height;
+
+        if (itemY < y || itemY + b.height >= y + scrollHeight) {
+            if (itemY < y) {
+                itemY -= 12;
+            } else {
+                itemY -= scrollHeight - b.height - 12;
+            }
+
+            JScrollBar bar = scroll.getVerticalScrollBar();
+            Timeline timeline = new Timeline(bar);
+            timeline.addPropertyToInterpolate("value", bar.getValue(), itemY);
+            timeline.setDuration(100);
+            timeline.play();
         }
     }
 
-    public void changeSelection(int delta) {
+    public void changeSelection(int delta, int keyCode) {
         int len = noteItems.size();
         int select = -1;
+
+        if (keyCode == KeyEvent.VK_UP || keyCode == KeyEvent.VK_DOWN) {
+            delta *= itemsPerRow;
+        }
 
         if (selectedNote == null) {
             if (len > 0) {
@@ -98,8 +175,7 @@ public class NoteList extends Background {
             deselectAll();
 
             NoteItem noteItem = noteItems.get(select);
-            noteItem.setSelected(true);
-            selectedNote = noteItem;
+            selectNote(noteItem);
             window.showNote(noteItem.note);
         }
     }
@@ -138,10 +214,9 @@ public class NoteList extends Background {
 
     private void selectNote(Note n) {
         deselectAll();
-        for (NoteItem i : noteItems) {
-            if (i.note == n) {
-                i.setSelected(true);
-                selectedNote = i;
+        for (NoteItem item : noteItems) {
+            if (item.note == n) {
+                selectNote(item);
                 return;
             }
         }
@@ -238,10 +313,9 @@ public class NoteList extends Background {
         @Override
         public void mouseClicked(MouseEvent e) {
             deselectAll();
-            setSelected(true);
 
             if (e.getClickCount() == 1) {
-                selectedNote = NoteItem.this;
+                selectNote(NoteItem.this);
                 window.showNote(note);
             }
         }

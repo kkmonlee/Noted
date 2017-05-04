@@ -3,6 +3,7 @@ import Core.Note;
 import Core.Notebook;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,7 @@ import java.awt.event.MouseEvent;
 public class Window extends JFrame {
     public static final Font fontH1 = Font.decode("Arial-BOLD-16");
     public static final Font fontSmall = Font.decode("Arial-10");
+    public static final Border emptyBorder = BorderFactory.createEmptyBorder(0, 0, 0, 0);
     private static final long serialVersionUID = -8255319694373975038L;
     private final String VERSION = "0.1 Alpha";
     JSplitPane splitLeft, splitRight;
@@ -75,7 +77,7 @@ public class Window extends JFrame {
         showNotes();
         noteEditor.clear();
         noteList.load(notebook);
-        noteList.changeSelection(1);
+        noteList.changeSelection(1, 0);
         noteList.unfocusEditor();
     }
 
@@ -178,12 +180,22 @@ public class Window extends JFrame {
                             switch (e.getKeyCode()) {
                                 case KeyEvent.VK_UP:
                                     if (!noteEditor.hasFocus()) {
-                                        noteList.changeSelection(-1);
+                                        noteList.changeSelection(-1, e.getKeyCode());
                                     }
                                     break;
                                 case KeyEvent.VK_DOWN:
                                     if (!noteEditor.hasFocus()) {
-                                        noteList.changeSelection(1);
+                                        noteList.changeSelection(1, e.getKeyCode());
+                                    }
+                                    break;
+                                case KeyEvent.VK_LEFT:
+                                    if (!noteEditor.hasFocus()) {
+                                        noteList.changeSelection(-1, e.getKeyCode());
+                                    }
+                                    break;
+                                case KeyEvent.VK_RIGHT:
+                                    if (!noteEditor.hasFocus()) {
+                                        noteList.changeSelection(1, e.getKeyCode());
                                     }
                                     break;
                             }
