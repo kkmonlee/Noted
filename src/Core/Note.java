@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
+
 
 /**
  * Created by aa on 03 May 2017.
@@ -41,6 +43,12 @@ public class Note {
 
     public String name() {
         return fileName;
+    }
+
+    public long lastModified() {
+        long l1 = file.lastModified();
+        long l2 = meta.lastModified();
+        return l1 > l2 ? l1 : l2;
     }
 
     public String contents() {
@@ -136,6 +144,15 @@ public class Note {
 
         private void reload() {
             map = getMetaMap();
+        }
+    }
+
+    public void moveTo(File dest) {
+        try {
+            FileUtils.moveFileToDirectory(file, dest, false);
+            FileUtils.moveFileToDirectory(meta, dest, false);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

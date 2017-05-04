@@ -3,6 +3,8 @@ package Core;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -27,6 +29,11 @@ public class Notebook {
                 notes.add(new Note(f));
             }
         }
+        sortNotes();
+    }
+
+    public void sortNotes() {
+        notes.sort((o1, o2) -> o1.lastModified() > o2.lastModified() ? -1 : 1);
     }
 
     public List<Note> getNotes() {
@@ -42,7 +49,7 @@ public class Notebook {
     }
 
     public Note newNote() throws IOException {
-        String fullPath = this.folder.getAbsolutePath() + File.separator + System.currentTimeMillis();
+        String fullPath = this.folder.getAbsolutePath() + File.separator + Long.toString(System.currentTimeMillis(), 36);
         File f = new File(fullPath);
 
         f.createNewFile();
@@ -52,5 +59,10 @@ public class Notebook {
         notes.add(0, n);
 
         return n;
+    }
+
+    public void deleteNote(Note note) {
+        note.moveTo(Library.getInstance().getTrash());
+        notes.remove(note);
     }
 }

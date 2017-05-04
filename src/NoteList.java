@@ -53,6 +53,7 @@ public class NoteList extends Background {
         scroll = new JScrollPane(main);
         scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.setBorder(Window.emptyBorder);
+        scroll.getVerticalScrollBar().setUnitIncrement(5);
 
         add(scroll);
 
@@ -98,6 +99,7 @@ public class NoteList extends Background {
         Rectangle mainBounds = main.getBounds();
 
         int itemAtRow = 0;
+        int lastOffset = 0;
         for (NoteItem item : noteItems) {
             size = item.getPreferredSize();
 
@@ -113,16 +115,18 @@ public class NoteList extends Background {
 
             item.setBounds(linedX, y + insets.top, size.width, size.height);
 
-            if (itemAtRow < itemsPerRow -1) {
+            if (itemAtRow < itemsPerRow - 1) {
                 itemAtRow++;
+                lastOffset = size.height;
             } else {
                 y += size.height;
                 itemAtRow = 0;
+                lastOffset = 0;
             }
         }
 
         Dimension d = main.getPreferredSize();
-        d.height = y + 12;
+        d.height = y + 12 + lastOffset;
         main.setPreferredSize(d);
     }
 
@@ -204,10 +208,28 @@ public class NoteList extends Background {
         }
     }
 
+    public void deleteSelected() {
+        if (selectedNote != null) {
+            int index = noteItems.indexOf(selectedNote);
+            notebook.deleteNote(selectedNote.note);
+            load(notebook);
+
+            if (index >= 0 && index < noteItems.size()) {
+                NoteItem item = noteItems.get(index);
+                window.showNote(item.note);
+                selectNote(item);
+            }
+        }
+    }
+
     public void updateThumb(Note note) {
         for (NoteItem item : noteItems) {
             if (item.note == note) {
                 item.updateThumb();
+                notebook.sortNotes();
+                load(notebook);
+                selectNote(item);
+                return;
             }
         }
     }

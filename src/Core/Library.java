@@ -13,6 +13,8 @@ public class Library {
     private static Library instance = null;
     private static ArrayList<Notebook> notebooks = new ArrayList<>();
     private final String HOME = "A:\\Docs\\Programming\\Noted";
+    private File home;
+    private File trash;
 
     private Library() {
         populate();
@@ -25,14 +27,25 @@ public class Library {
         return instance;
     }
 
+    public File getHome() {
+        return home;
+    }
+
+    public File getTrash() {
+        return trash;
+    }
+
     private void populate() {
-        File home = new File(HOME);
+        home = new File(HOME);
 
         for (File f : home.listFiles()) {
             if (Files.isDirectory(f.toPath())) {
                 notebooks.add(new Notebook(f));
             }
         }
+
+        trash = new File(home.getAbsoluteFile() + File.separator + "Trash");
+        trash.mkdirs();
 
         notebooks.sort(Comparator.comparing(o -> o.name().toLowerCase()));
     }

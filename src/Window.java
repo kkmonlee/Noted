@@ -175,31 +175,28 @@ public class Window extends JFrame {
         public boolean dispatchKeyEvent(KeyEvent e) {
             switch (modes) {
                 case notes:
-                    switch (e.getID()) {
-                        case KeyEvent.KEY_PRESSED:
-                            switch (e.getKeyCode()) {
-                                case KeyEvent.VK_UP:
-                                    if (!noteEditor.hasFocus()) {
+                    if (!noteEditor.hasFocus()) {
+                        switch (e.getID()) {
+                            case KeyEvent.KEY_PRESSED:
+                                switch (e.getKeyCode()) {
+                                    case KeyEvent.VK_UP:
                                         noteList.changeSelection(-1, e.getKeyCode());
-                                    }
-                                    break;
-                                case KeyEvent.VK_DOWN:
-                                    if (!noteEditor.hasFocus()) {
+                                        break;
+                                    case KeyEvent.VK_DOWN:
                                         noteList.changeSelection(1, e.getKeyCode());
-                                    }
-                                    break;
-                                case KeyEvent.VK_LEFT:
-                                    if (!noteEditor.hasFocus()) {
+                                        break;
+                                    case KeyEvent.VK_LEFT:
                                         noteList.changeSelection(-1, e.getKeyCode());
-                                    }
-                                    break;
-                                case KeyEvent.VK_RIGHT:
-                                    if (!noteEditor.hasFocus()) {
+                                        break;
+                                    case KeyEvent.VK_RIGHT:
                                         noteList.changeSelection(1, e.getKeyCode());
-                                    }
-                                    break;
-                            }
-                            break;
+                                        break;
+                                    case KeyEvent.VK_BACK_SPACE:
+                                        noteEditor.clear();
+                                        noteList.deleteSelected();
+                                }
+                                break;
+                        }
                     }
                     break;
                 case notebooks:
