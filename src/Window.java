@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 
 /**
  * Created by aa on 03 May 2017.
@@ -51,6 +52,10 @@ public class Window extends JFrame {
 
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher(new KeyDispatcher());
+
+        Image image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("images/Noted-logo_icon_128.png"));
+        ImageIcon icon = new ImageIcon(image);
+        setIconImage(icon.getImage());
     }
 
     private void showNotes() {
