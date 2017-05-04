@@ -9,37 +9,42 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.File;
 
 /**
  * Created by aa on 03 May 2017.
  */
 public class Window extends JFrame {
-    public static final Font fontH1 = Font.decode("Arial-BOLD-16");
-    public static final Font fontSmall = Font.decode("Arial-10");
-    public static final Border emptyBorder = BorderFactory.createEmptyBorder(0, 0, 0, 0);
-    private static final long serialVersionUID = -8255319694373975038L;
-    private final String VERSION = "0.1 Alpha";
-    JSplitPane splitLeft, splitRight;
-    Modes modes;
 
-    ActionListener showNotesAction = e -> showNotes();
-
-    ActionListener showTagsAction = e -> showTags();
+    public static final Font fontH1 = Font.decode("Helvetica-BOLD-16");
+    public static final Font fontSmall = Font.decode("Helvetica-10");
+    public static final Font fontEditor = Font.decode("Arial-13");
+    public static final Font fontBoldNormal = Font.decode("Helvetica-BOLD-14");
 
     private Sidebar sidebar = new Sidebar();
     private NoteList noteList = new NoteList(this);
     private NoteEditor noteEditor = new NoteEditor(this);
 
-    ActionListener newNoteAction = e -> {
+    public static final Border emptyBorder = BorderFactory.createEmptyBorder(0, 0, 0, 0);
+    private static final long serialVersionUID = -8255319694373975038L;
+    private final String VERSION = "0.1 Alpha";
+    private JSplitPane splitLeft, splitRight;
+    private Modes modes;
+
+    private ActionListener showNotesAction = e -> showNotes();
+
+    private ActionListener showTagsAction = e -> showTags();
+
+    private ActionListener newNoteAction = e -> {
         showNotes();
         newNote();
     };
 
     private Notebooks notebooks = new Notebooks(this);
 
-    ActionListener newNotebookAction = e -> showNotebooks();
+    private ActionListener newNotebookAction = e -> showNotebooks();
 
-    ActionListener showNotebooksAction = e -> showNotebooks();
+    private ActionListener showNotebooksAction = e -> showNotebooks();
 
     public Window() {
         setTitle("Noted " + VERSION);
@@ -173,6 +178,14 @@ public class Window extends JFrame {
     private class KeyDispatcher implements KeyEventDispatcher {
         @Override
         public boolean dispatchKeyEvent(KeyEvent e) {
+            switch  (e.getID()) {
+                case KeyEvent.KEY_PRESSED:
+                    if (e.getKeyCode() >= KeyEvent.VK_1 && e.getKeyCode() <= KeyEvent.VK_9) {
+                        String target = sidebar.shortcuts.getTarget(e.getKeyCode() - KeyEvent.VK_1);
+                        openShortcut(target);
+                    }
+                    break;
+            }
             switch (modes) {
                 case notes:
                     if (!noteEditor.hasFocus()) {
@@ -218,6 +231,29 @@ public class Window extends JFrame {
                     break;
             }
             return false;
+        }
+    }
+
+    private void openShortcut(String target) {
+        File f = new File(target);
+        if (f.exists()) {
+            if (f.isDirectory()) {
+                Notebook notebook = Library.getInstance().findNotebook(f);
+                if (notebook != null) {
+                    showNotebook(notebook);
+                }
+            } else {
+                File folder = f.getParentFile();
+                Notebook notebook = Library.getInstance().findNotebook(folder);
+                if (notebook != null) {
+                    Note note = notebook.find(f.getName());
+                    if (note != null) {
+                        showNotebook(notebook);
+                        noteList.selectNote(note);
+                        showNote(note);
+                    }
+                }
+            }
         }
     }
 

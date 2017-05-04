@@ -156,4 +156,8 @@ public class Note {
         }
     }
 
+    public boolean equals(File f) {
+        return file.equals(f);
+    }
+
 }

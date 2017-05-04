@@ -1,5 +1,8 @@
+import Core.Library;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -18,7 +21,15 @@ public class Sidebar extends Background {
         }
     }
 
+    SidebarList shortcuts;
+
     public Sidebar() {
         super(tile);
+
+        shortcuts = new SidebarList();
+        shortcuts.load(new File(Library.getInstance().getHome() + File.separator + ".shortcuts"));
+
+        shortcuts.setOpaque(false);
+        add(shortcuts, BorderLayout.NORTH);
     }
 }

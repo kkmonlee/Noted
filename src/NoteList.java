@@ -236,7 +236,7 @@ public class NoteList extends Background {
         window.showNotebook(notebook);
     }
 
-    private void selectNote(Note n) {
+    public void selectNote(Note n) {
         deselectAll();
         for (NoteItem item : noteItems) {
             if (item.note == n) {
