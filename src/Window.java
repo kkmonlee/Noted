@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.net.URL;
 
 /**
  * Created by aa on 03 May 2017.
@@ -186,6 +185,23 @@ public class Window extends JFrame {
                                     if (!noteEditor.hasFocus()) {
                                         noteList.changeSelection(1);
                                     }
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
+                case notebooks:
+                    switch (e.getID()) {
+                        case KeyEvent.KEY_PRESSED:
+                            switch (e.getKeyCode()) {
+                                case KeyEvent.VK_UP:
+                                    notebooks.changeSelection(-1);
+                                    break;
+                                case KeyEvent.VK_DOWN:
+                                    notebooks.changeSelection(1);
+                                    break;
+                                case KeyEvent.VK_ENTER:
+                                    notebooks.openSelected();
                                     break;
                             }
                             break;

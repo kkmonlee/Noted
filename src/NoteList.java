@@ -78,7 +78,7 @@ public class NoteList extends Background {
     }
 
     public void changeSelection(int delta) {
-        int len = main.getComponentCount();
+        int len = noteItems.size();
         int select = -1;
 
         if (selectedNote == null) {
@@ -108,6 +108,7 @@ public class NoteList extends Background {
         for (NoteItem i : noteItems) {
             i.setSelected(false);
         }
+        selectedNote = null;
     }
 
     public void unfocusEditor() {

@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by aa on 03 May 2017.
@@ -29,6 +30,7 @@ public class Notebooks extends Background {
     private Window window;
     private NotebookItem selectedNotebook;
     private JPanel main;
+    private ArrayList<NotebookItem> notebookItems = new ArrayList<>();
 
     public Notebooks(Window w) {
         super(tile);
@@ -72,6 +74,7 @@ public class Notebooks extends Background {
 
     private void update() {
         main.removeAll();
+        notebookItems.clear();
 
         Insets insets = main.getInsets();
         Dimension size;
@@ -83,6 +86,7 @@ public class Notebooks extends Background {
         for (Notebook nb : list) {
             NotebookItem item = new NotebookItem(nb);
             main.add(item);
+            notebookItems.add(item);
 
             size = item.getPreferredSize();
             item.setBounds(12 + insets.left, y + insets.top, size.width, size.height);
@@ -94,6 +98,39 @@ public class Notebooks extends Background {
     private void deselectAll() {
         if (selectedNotebook != null) {
             selectedNotebook.setSelected(false);
+            selectedNotebook = null;
+        }
+    }
+
+    public void changeSelection(int delta) {
+        int len = notebookItems.size();
+        int select = 01;
+
+        if (selectedNotebook == null) {
+            if (len > 0) {
+                if (delta < 0) {
+                    select = len - 1;
+                } else {
+                    select = 0;
+                }
+            }
+        } else {
+            int currentIndex = notebookItems.indexOf(selectedNotebook);
+            select = currentIndex + delta;
+        }
+
+        if (select >= 0 && select < len) {
+            deselectAll();
+
+            NotebookItem item = notebookItems.get(select);
+            item.setSelected(true);
+            selectedNotebook = item;
+        }
+    }
+
+    public void openSelected() {
+        if (selectedNotebook != null) {
+            window.showNotebook(selectedNotebook.notebook);
         }
     }
 
