@@ -1,3 +1,5 @@
+package Base;
+
 import javax.swing.*;
 import java.awt.*;
 

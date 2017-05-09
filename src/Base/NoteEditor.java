@@ -1,3 +1,5 @@
+package Base;
+
 import Core.Note;
 
 import javax.imageio.ImageIO;
@@ -25,7 +27,9 @@ public class NoteEditor extends Background implements CustomEditor.EditorEventLi
     }
 
     private final int border = 14;
-    private JPanel main;
+    private final int noteOffset = 65;
+    private final int minNoteOffset = 288;
+    private JPanel main, area;
     private CustomEditor editor;
     private Window window;
     private Note currentNote;
@@ -46,13 +50,13 @@ public class NoteEditor extends Background implements CustomEditor.EditorEventLi
         tools.setBounds(0, 0, 1920, 65);
         main.add(tools);
 
-        final JPanel area = new JPanel();
+        area = new JPanel();
         area.setLayout(new GridLayout(1, 1));
         area.setBackground(Color.WHITE);
 
         editor = new CustomEditor();
         area.add(editor);
-        area.setBounds(border, 65 + border, 200, 288);
+        area.setBounds(border, noteOffset + border, 200, minNoteOffset);
 
         main.add(area);
 
@@ -109,7 +113,7 @@ public class NoteEditor extends Background implements CustomEditor.EditorEventLi
         window.unfocusedEditor();
     }
 
-    private void saveChanges() {
+    public void saveChanges() {
         if (currentNote != null) {
             boolean changed = false;
             boolean contentChanged = false;
@@ -149,5 +153,28 @@ public class NoteEditor extends Background implements CustomEditor.EditorEventLi
     @Override
     public void editingFocusLost() {
         saveChanges();
+    }
+
+    @Override
+    public void caretChanged(final JTextPane text) {
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Rectangle y = text.modelToView(text.getDocument().getLength());
+                    if (y != null) {
+                        int height = y.y + y.height + noteOffset;
+                        if (height < minNoteOffset) {
+                            height = minNoteOffset;
+                        }
+                        Rectangle b = area.getBounds();
+                        area.setBounds(b.x, b.y, b.width, height);
+                        area.revalidate();
+                    }
+                } catch (BadLocationException ignored) {
+
+                }
+            }
+        });
     }
 }

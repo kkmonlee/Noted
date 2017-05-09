@@ -1,14 +1,20 @@
+package Base;
+
 import javax.swing.*;
 import java.awt.*;
+import com.google.common.eventbus.EventBus;
 
 /**
  * Created by aa on 03 May 2017.
  */
 public class Noted {
+
+    public static final EventBus eventBus = new EventBus();
+
     public static void main(String args[]) {
         try {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
-            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Noted");
+            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Base.Noted");
             System.setProperty("awt.useSystemAAFontSettings", "on");
             System.setProperty("swing.aatext", "true");
 

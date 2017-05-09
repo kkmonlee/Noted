@@ -1,5 +1,8 @@
+package Base;
+
 import Core.Library;
 import Core.Notebook;
+import com.google.common.eventbus.Subscribe;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -35,7 +38,17 @@ public class Notebooks extends Background {
     public Notebooks(Window w) {
         super(tile);
         window = w;
+        Noted.eventBus.register(this);
         createComponents();
+        update();
+    }
+
+    @Subscribe
+    public void handleNotebookEvent(NotebookEvent event) {
+        refresh();
+    }
+
+    public void refresh() {
         update();
     }
 

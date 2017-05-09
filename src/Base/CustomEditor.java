@@ -1,4 +1,8 @@
+package Base;
+
 import javax.swing.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
@@ -18,6 +22,7 @@ public class CustomEditor extends JPanel {
 
     public interface EditorEventListener {
         void editingFocusLost();
+        void caretChanged(JTextPane text);
     }
 
     private EditorEventListener listener;
@@ -79,9 +84,18 @@ public class CustomEditor extends JPanel {
         titlePanel.add(title, BorderLayout.CENTER);
 
         note = new JTextPane();
-        note.setBorder(BorderFactory.createEmptyBorder(12, 0, 0, 0));
         note.addFocusListener(focusListener);
         note.setFont(Window.fontEditor);
+        note.setBorder(BorderFactory.createEmptyBorder(12, 0, 0, 0));
+
+        note.addCaretListener(new CaretListener() {
+            @Override
+            public void caretUpdate(CaretEvent e) {
+                if (listener != null) {
+                    listener.caretChanged(note);
+                }
+            }
+        });
 
         title.setText("");
 

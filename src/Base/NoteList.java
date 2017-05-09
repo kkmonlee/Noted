@@ -1,3 +1,5 @@
+package Base;
+
 import Core.Note;
 import Core.Notebook;
 

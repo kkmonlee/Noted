@@ -1,3 +1,5 @@
+package Base;
+
 import Core.Library;
 import Core.Note;
 import Core.Notebook;
@@ -54,7 +56,7 @@ public class Window extends JFrame {
     private ActionListener showNotebooksAction = e -> showNotebooks();
 
     public Window() {
-        setTitle("Noted " + VERSION);
+        setTitle("Base.Noted " + VERSION);
         setSize(1080, 1050);
 
         createMenu();
@@ -239,7 +241,7 @@ public class Window extends JFrame {
             switch (e.getID()) {
                 case KeyEvent.KEY_PRESSED:
                     if (e.getKeyCode() >= KeyEvent.VK_1 && e.getKeyCode() <= KeyEvent.VK_9) {
-                        if ((e.getModifiers() & KeyEvent.ALT_MASK) == 0) {
+                        if ((e.getModifiers() & KeyEvent.META_MASK) == KeyEvent.META_MASK && (e.getModifiers() & KeyEvent.ALT_MASK) == 0) {
                             String target = sidebar.shortcuts.getTarget(e.getKeyCode() - KeyEvent.VK_1);
                             openShortcut(target);
                         }
@@ -253,6 +255,7 @@ public class Window extends JFrame {
     public void openShortcut(String target) {
         File f = new File(target);
         if (f.exists()) {
+            noteEditor.saveChanges();
             if (f.isDirectory()) {
                 Notebook notebook = Library.getInstance().findNotebook(f);
                 if (notebook != null) {
