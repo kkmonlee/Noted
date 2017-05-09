@@ -41,7 +41,7 @@ public class CustomEditor extends JPanel {
     public CustomEditor() {
         super();
         setBackground(Color.WHITE);
-        setBorder(BorderFactory.createEmptyBorder(14, 14, 14, 14));
+        setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
         setLayout(new BorderLayout());
 
         JPanel titlePanel = new JPanel();

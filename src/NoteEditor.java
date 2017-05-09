@@ -65,6 +65,13 @@ public class NoteEditor extends Background implements CustomEditor.EditorEventLi
                 Rectangle ab = area.getBounds();
                 ab.width = mb.width - border * 2;
                 area.setBounds(ab);
+
+                EventQueue.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        NoteEditor.this.editor.revalidate();
+                    }
+                });
             }
         });
 
