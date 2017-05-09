@@ -1,10 +1,12 @@
 package Core;
 
+import Base.Noted;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import Base.NotebookEvent.Kind;
+import Base.NotebookEvent;
 import java.util.List;
 
 /**
@@ -62,12 +64,14 @@ public class Notebook {
 
         notes.add(0, n);
 
+        Noted.eventBus.post(new NotebookEvent(Kind.noteCreated));
+
         return n;
     }
 
     public void deleteNote(Note note) {
-        note.moveTo(Library.getInstance().getTrash());
         notes.remove(note);
+        note.moveTo(Library.getInstance().getTrash());
     }
 
     public Note find(String name) {
@@ -79,5 +83,9 @@ public class Notebook {
         }
 
         return null;
+    }
+
+    public void refresh() {
+        populate();
     }
 }

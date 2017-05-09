@@ -12,7 +12,7 @@ import java.util.List;
 public class Library {
     private static Library instance = null;
     private static ArrayList<Notebook> notebooks = new ArrayList<>();
-    private final String HOME = "A:\\Docs\\Programming\\Noted";
+    private final String HOME = "A:\\Docs\\Programming\\Base.Noted";
     private File home;
     private File trash;
 

@@ -1,5 +1,8 @@
 package Core;
 
+import Base.NotebookEvent;
+import Base.NotebookEvent.Kind;
+import Base.Noted;
 import IO.IOUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -151,6 +154,12 @@ public class Note {
         try {
             FileUtils.moveFileToDirectory(file, dest, false);
             FileUtils.moveFileToDirectory(meta, dest, false);
+
+            Notebook nb = Library.getInstance().findNotebook(dest);
+            if (nb != null) {
+                nb.refresh();
+                Noted.eventBus.post(new NotebookEvent(Kind.noteMoved));
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
