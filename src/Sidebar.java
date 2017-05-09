@@ -12,6 +12,7 @@ public class Sidebar extends Background {
 
     private static final long serialVersionUID = -1733165438644879034L;
     private static Image tile;
+    private Window window;
 
     static {
         try {
@@ -23,10 +24,11 @@ public class Sidebar extends Background {
 
     SidebarList shortcuts;
 
-    public Sidebar() {
+    public Sidebar(Window w) {
         super(tile);
+        window = w;
 
-        shortcuts = new SidebarList();
+        shortcuts = new SidebarList(window);
         shortcuts.load(new File(Library.getInstance().getHome() + File.separator + ".shortcuts"));
 
         shortcuts.setOpaque(false);

@@ -4,6 +4,8 @@ import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 /**
  * Created by aa on 03 May 2017.
@@ -52,6 +54,27 @@ public class CustomEditor extends JPanel {
         title = new JTextField();
         title.setBorder(BorderFactory.createEmptyBorder(0, 0, 12, 0));
         title.addFocusListener(focusListener);
+
+        final KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+
+        title.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    manager.focusNextComponent();
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+            }
+        });
 
         titlePanel.add(title, BorderLayout.CENTER);
 

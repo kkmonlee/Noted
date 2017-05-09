@@ -21,7 +21,7 @@ public class Window extends JFrame {
     public static final Font fontEditor = Font.decode("Arial-13");
     public static final Font fontBoldNormal = Font.decode("Helvetica-BOLD-14");
 
-    private Sidebar sidebar = new Sidebar();
+    private Sidebar sidebar = new Sidebar(this);
     private NoteList noteList = new NoteList(this);
     private NoteEditor noteEditor = new NoteEditor(this);
 
@@ -38,6 +38,13 @@ public class Window extends JFrame {
     private ActionListener newNoteAction = e -> {
         showNotes();
         newNote();
+    };
+
+    ActionListener saveNoteAction = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            unfocusedEditor();
+        }
     };
 
     private Notebooks notebooks = new Notebooks(this);
@@ -115,6 +122,13 @@ public class Window extends JFrame {
         newNotebook.addActionListener(newNotebookAction);
         file.add(newNotebook);
 
+        file.addSeparator();
+
+        JMenuItem saveNote = new JMenuItem("Save");
+        saveNote.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.META_MASK));
+        saveNote.addActionListener(saveNoteAction);
+        file.add(saveNote);
+
         JMenu edit = new JMenu("Edit");
         JMenu view = new JMenu("View");
 
@@ -178,14 +192,6 @@ public class Window extends JFrame {
     private class KeyDispatcher implements KeyEventDispatcher {
         @Override
         public boolean dispatchKeyEvent(KeyEvent e) {
-            switch  (e.getID()) {
-                case KeyEvent.KEY_PRESSED:
-                    if (e.getKeyCode() >= KeyEvent.VK_1 && e.getKeyCode() <= KeyEvent.VK_9) {
-                        String target = sidebar.shortcuts.getTarget(e.getKeyCode() - KeyEvent.VK_1);
-                        openShortcut(target);
-                    }
-                    break;
-            }
             switch (modes) {
                 case notes:
                     if (!noteEditor.hasFocus()) {
@@ -230,11 +236,21 @@ public class Window extends JFrame {
                     }
                     break;
             }
+            switch (e.getID()) {
+                case KeyEvent.KEY_PRESSED:
+                    if (e.getKeyCode() >= KeyEvent.VK_1 && e.getKeyCode() <= KeyEvent.VK_9) {
+                        if ((e.getModifiers() & KeyEvent.ALT_MASK) == 0) {
+                            String target = sidebar.shortcuts.getTarget(e.getKeyCode() - KeyEvent.VK_1);
+                            openShortcut(target);
+                        }
+                    }
+                    break;
+            }
             return false;
         }
     }
 
-    private void openShortcut(String target) {
+    public void openShortcut(String target) {
         File f = new File(target);
         if (f.exists()) {
             if (f.isDirectory()) {
