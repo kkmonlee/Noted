@@ -14,7 +14,6 @@ public class Sidebar extends Background {
 
     private static final long serialVersionUID = -1733165438644879034L;
     private static Image tile;
-    private Window window;
 
     static {
         try {
@@ -25,6 +24,7 @@ public class Sidebar extends Background {
     }
 
     SidebarList shortcuts;
+    private Window window;
 
     public Sidebar(Window w) {
         super(tile);

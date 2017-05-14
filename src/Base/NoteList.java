@@ -2,6 +2,7 @@ package Base;
 
 import Core.Note;
 import Core.Notebook;
+import org.pushingpixels.trident.Timeline;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -13,8 +14,6 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.pushingpixels.trident.Timeline;
 
 /**
  * Created by aa on 03 May 2017.
@@ -41,6 +40,7 @@ public class NoteList extends Background {
     private NoteItem selectedNote;
     private ArrayList<NoteItem> noteItems = new ArrayList<>();
     private JScrollPane scroll;
+    private int itemsPerRow;
 
     public NoteList(Window w) {
         super(tile);
@@ -89,8 +89,6 @@ public class NoteList extends Background {
         layoutItems();
         revalidate();
     }
-
-    private int itemsPerRow;
 
     private void layoutItems() {
         Insets insets = main.getInsets();

@@ -1,12 +1,12 @@
 package Core;
 
+import Base.NotebookEvent;
+import Base.NotebookEvent.Kind;
 import Base.Noted;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import Base.NotebookEvent.Kind;
-import Base.NotebookEvent;
 import java.util.List;
 
 /**
@@ -21,6 +21,22 @@ public class Notebook {
         this.name = folder.getName();
         this.folder = folder;
         populate();
+    }
+
+    public static Notebook newNotebook() throws IOException {
+        String baseName = Library.getInstance().getHome() + File.separator + "New notebook";
+        File f = new File(baseName);
+        int n = 2;
+        while (f.exists()) {
+            f = new File(baseName + " " + n);
+            n++;
+        }
+
+        if (!f.mkdirs()) {
+            throw new IOException();
+        }
+
+        return new Notebook(f);
     }
 
     private void populate() {
@@ -40,22 +56,6 @@ public class Notebook {
 
     public File folder() {
         return folder;
-    }
-
-    public static Notebook newNotebook() throws IOException {
-        String baseName = Library.getInstance().getHome() + File.separator + "New notebook";
-        File f = new File(baseName);
-        int n = 2;
-        while (f.exists()) {
-            f = new File(baseName + " " + n);
-            n++;
-        }
-
-        if (!f.mkdirs()) {
-            throw new IOException();
-        }
-
-        return new Notebook(f);
     }
 
     public boolean rename(String s) {

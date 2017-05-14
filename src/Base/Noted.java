@@ -1,8 +1,9 @@
 package Base;
 
+import com.google.common.eventbus.EventBus;
+
 import javax.swing.*;
 import java.awt.*;
-import com.google.common.eventbus.EventBus;
 
 /**
  * Created by aa on 03 May 2017.

@@ -24,28 +24,21 @@ public class Window extends JFrame {
     public static final Font fontSmall = Font.decode("Helvetica-10");
     public static final Font fontEditor = Font.decode("Arial-13");
     public static final Font fontBoldNormal = Font.decode("Helvetica-BOLD-14");
-
-    private Sidebar sidebar = new Sidebar(this);
-    private NoteList noteList = new NoteList(this);
-    private NoteEditor noteEditor = new NoteEditor(this);
-
     public static final Border emptyBorder = BorderFactory.createEmptyBorder(0, 0, 0, 0);
     private static final long serialVersionUID = -8255319694373975038L;
     private final String VERSION = "0.1 Alpha";
+    private Sidebar sidebar = new Sidebar(this);
+    private NoteList noteList = new NoteList(this);
+    ActionListener saveNoteAction = e -> unfocusedEditor();
+    private NoteEditor noteEditor = new NoteEditor(this);
     private JSplitPane splitLeft, splitRight;
     private Modes modes;
-
     private ActionListener showNotesAction = e -> showNotes();
-
     private ActionListener showTagsAction = e -> showTags();
-
     private ActionListener newNoteAction = e -> {
         showNotes();
         newNote();
     };
-
-    ActionListener saveNoteAction = e -> unfocusedEditor();
-
     private Notebooks notebooks = new Notebooks(this);
 
     private ActionListener newNotebookAction = e -> {
@@ -190,6 +183,45 @@ public class Window extends JFrame {
         noteList.updateThumb(event.note);
     }
 
+    public void openShortcut(String target) {
+        File f = new File(target);
+        if (f.exists()) {
+            noteEditor.saveChanges();
+            if (f.isDirectory()) {
+                Notebook notebook = Library.getInstance().findNotebook(f);
+                if (notebook != null) {
+                    showNotebook(notebook);
+                }
+            } else {
+                File folder = f.getParentFile();
+                Notebook notebook = Library.getInstance().findNotebook(folder);
+                if (notebook != null) {
+                    Note note = notebook.find(f.getName());
+                    if (note != null) {
+                        showNotebook(notebook);
+                        noteList.selectNote(note);
+                        showNote(note);
+                    }
+                }
+            }
+        }
+    }
+
+    public void focusEditor() {
+        noteEditor.focusTitle();
+    }
+
+    public void sortAndUpdate() {
+        noteList.sortAndUpdate();
+    }
+
+    @Subscribe
+    public void handleLibraryEvent(LibraryEvent event) {
+        if (event.kind == LibraryEvent.Kind.notebookListChanged) {
+            notebooks.refresh();
+        }
+    }
+
     enum Modes {
         notebooks, notes, tags
     }
@@ -255,45 +287,6 @@ public class Window extends JFrame {
                     break;
             }
             return false;
-        }
-    }
-
-    public void openShortcut(String target) {
-        File f = new File(target);
-        if (f.exists()) {
-            noteEditor.saveChanges();
-            if (f.isDirectory()) {
-                Notebook notebook = Library.getInstance().findNotebook(f);
-                if (notebook != null) {
-                    showNotebook(notebook);
-                }
-            } else {
-                File folder = f.getParentFile();
-                Notebook notebook = Library.getInstance().findNotebook(folder);
-                if (notebook != null) {
-                    Note note = notebook.find(f.getName());
-                    if (note != null) {
-                        showNotebook(notebook);
-                        noteList.selectNote(note);
-                        showNote(note);
-                    }
-                }
-            }
-        }
-    }
-
-    public void focusEditor() {
-        noteEditor.focusTitle();
-    }
-
-    public void sortAndUpdate() {
-        noteList.sortAndUpdate();
-    }
-
-    @Subscribe
-    public void handleLibraryEvent(LibraryEvent event) {
-        if (event.kind == LibraryEvent.Kind.notebookListChanged) {
-            notebooks.refresh();
         }
     }
 }

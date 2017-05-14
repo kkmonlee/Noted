@@ -74,27 +74,9 @@ public class SidebarList extends JPanel {
         private static final long serialVersionUID = -1786795327565836884L;
 
         File file;
-        private Icon icon;
         String target;
         JLabel label;
-
-        @Subscribe
-        public void handleNoteChanged(NoteChangedEvent event) {
-            if (event.note.equals(file)) {
-                refresh();
-            }
-        }
-
-        public void refresh() {
-            if (file.isDirectory()) {
-                icon = Icon.notebookSmall;
-                label.setText(file.getName());
-            } else {
-                icon = Icon.noteSmall;
-                Note note = new Note(file);
-                label.setText(note.getMeta().title());
-            }
-        }
+        private Icon icon;
 
         public SidebarListItem(String targetFileName) {
             setOpaque(false);
@@ -139,6 +121,24 @@ public class SidebarList extends JPanel {
 
                 }
             });
+        }
+
+        @Subscribe
+        public void handleNoteChanged(NoteChangedEvent event) {
+            if (event.note.equals(file)) {
+                refresh();
+            }
+        }
+
+        public void refresh() {
+            if (file.isDirectory()) {
+                icon = Icon.notebookSmall;
+                label.setText(file.getName());
+            } else {
+                icon = Icon.noteSmall;
+                Note note = new Note(file);
+                label.setText(note.getMeta().title());
+            }
         }
     }
 }

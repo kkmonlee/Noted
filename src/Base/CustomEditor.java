@@ -19,18 +19,7 @@ public class CustomEditor extends JPanel {
     private final Color dividerColor = Color.decode("#dbdbdb");
     private JTextField title;
     private JTextPane note;
-
-    public interface EditorEventListener {
-        void editingFocusLost();
-        void caretChanged(JTextPane text);
-    }
-
     private EditorEventListener listener;
-
-    public void setEditorEventListener(EditorEventListener listener) {
-        this.listener = listener;
-    }
-
     FocusListener focusListener = new FocusListener() {
         @Override
         public void focusGained(FocusEvent e) {
@@ -103,6 +92,10 @@ public class CustomEditor extends JPanel {
         add(note, BorderLayout.CENTER);
     }
 
+    public void setEditorEventListener(EditorEventListener listener) {
+        this.listener = listener;
+    }
+
     public String getTitle() {
         return title.getText();
     }
@@ -139,5 +132,11 @@ public class CustomEditor extends JPanel {
     public void focusTitle() {
         title.setCaretPosition(0);
         title.requestFocusInWindow();
+    }
+
+    public interface EditorEventListener {
+        void editingFocusLost();
+
+        void caretChanged(JTextPane text);
     }
 }

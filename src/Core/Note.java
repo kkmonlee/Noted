@@ -4,6 +4,7 @@ import Base.NotebookEvent;
 import Base.NotebookEvent.Kind;
 import Base.Noted;
 import IO.IOUtil;
+import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,8 +13,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
 
 
 /**
@@ -116,6 +115,25 @@ public class Note {
         return new Metadata(getMetaMap());
     }
 
+    public void moveTo(File dest) {
+        try {
+            FileUtils.moveFileToDirectory(file, dest, false);
+            FileUtils.moveFileToDirectory(meta, dest, false);
+
+            Notebook nb = Library.getInstance().findNotebook(dest);
+            if (nb != null) {
+                nb.refresh();
+                Noted.eventBus.post(new NotebookEvent(Kind.noteMoved));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean equals(File f) {
+        return file.equals(f);
+    }
+
     public interface Meta {
         public String title();
 
@@ -148,25 +166,6 @@ public class Note {
         private void reload() {
             map = getMetaMap();
         }
-    }
-
-    public void moveTo(File dest) {
-        try {
-            FileUtils.moveFileToDirectory(file, dest, false);
-            FileUtils.moveFileToDirectory(meta, dest, false);
-
-            Notebook nb = Library.getInstance().findNotebook(dest);
-            if (nb != null) {
-                nb.refresh();
-                Noted.eventBus.post(new NotebookEvent(Kind.noteMoved));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public boolean equals(File f) {
-        return file.equals(f);
     }
 
 }
