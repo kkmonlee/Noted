@@ -86,11 +86,11 @@ public class NoteList extends Background {
             main.add(item);
             noteItems.add(item);
         }
-
         layoutItems();
+        revalidate();
     }
 
-    int itemsPerRow;
+    private int itemsPerRow;
 
     private void layoutItems() {
         Insets insets = main.getInsets();
@@ -220,6 +220,9 @@ public class NoteList extends Background {
                 NoteItem item = noteItems.get(index);
                 window.showNote(item.note);
                 selectNote(item);
+            } else {
+                selectedNote = null;
+                window.showNotebook(notebook);
             }
         }
     }
