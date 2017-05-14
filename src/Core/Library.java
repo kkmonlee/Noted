@@ -1,5 +1,8 @@
 package Core;
 
+import Base.Noted;
+import com.google.common.eventbus.Subscribe;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -17,6 +20,7 @@ public class Library {
     private File trash;
 
     private Library() {
+        Noted.eventBus.register(this);
         populate();
     }
 
@@ -38,15 +42,21 @@ public class Library {
     private void populate() {
         home = new File(HOME);
 
+        trash = new File(home.getAbsolutePath() + File.separator + "Trash");
+        trash.mkdirs();
+
         for (File f : home.listFiles()) {
             if (Files.isDirectory(f.toPath())) {
-                notebooks.add(new Notebook(f));
+                if (findNotebook(f) == null) {
+                    notebooks.add(new Notebook(f));
+                }
             }
         }
 
-        trash = new File(home.getAbsoluteFile() + File.separator + "Trash");
-        trash.mkdirs();
+        sortNotebooks();
+    }
 
+    private void sortNotebooks() {
         notebooks.sort(Comparator.comparing(o -> o.name().toLowerCase()));
     }
 
@@ -62,5 +72,10 @@ public class Library {
         }
 
         return null;
+    }
+
+    @Subscribe
+    public void handleLibraryEvent(LibraryEvent event) {
+        populate();
     }
 }

@@ -1,6 +1,7 @@
 package Base;
 
 import Core.Library;
+import Core.LibraryEvent;
 import Core.Note;
 import Core.Notebook;
 import com.google.common.eventbus.Subscribe;
@@ -43,16 +44,14 @@ public class Window extends JFrame {
         newNote();
     };
 
-    ActionListener saveNoteAction = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            unfocusedEditor();
-        }
-    };
+    ActionListener saveNoteAction = e -> unfocusedEditor();
 
     private Notebooks notebooks = new Notebooks(this);
 
-    private ActionListener newNotebookAction = e -> showNotebooks();
+    private ActionListener newNotebookAction = e -> {
+        showNotebooks();
+        notebooks.newNotebook();
+    };
 
     private ActionListener showNotebooksAction = e -> showNotebooks();
 
@@ -225,20 +224,23 @@ public class Window extends JFrame {
                     }
                     break;
                 case notebooks:
-                    switch (e.getID()) {
-                        case KeyEvent.KEY_PRESSED:
-                            switch (e.getKeyCode()) {
-                                case KeyEvent.VK_UP:
-                                    notebooks.changeSelection(-1);
-                                    break;
-                                case KeyEvent.VK_DOWN:
-                                    notebooks.changeSelection(1);
-                                    break;
-                                case KeyEvent.VK_ENTER:
-                                    notebooks.openSelected();
-                                    break;
-                            }
-                            break;
+                    if (!notebooks.isEditing()) {
+                        switch (e.getID()) {
+                            case KeyEvent.KEY_PRESSED:
+                                switch (e.getKeyCode()) {
+                                    case KeyEvent.VK_UP:
+                                    case KeyEvent.VK_LEFT:
+                                        notebooks.changeSelection(-1, e.getKeyCode());
+                                        break;
+                                    case KeyEvent.VK_DOWN:
+                                    case KeyEvent.VK_RIGHT:
+                                        notebooks.changeSelection(1, e.getKeyCode());
+                                        break;
+                                    case KeyEvent.VK_ENTER:
+                                        notebooks.openSelected();
+                                        break;
+                                }
+                        }
                     }
                     break;
             }
@@ -288,4 +290,10 @@ public class Window extends JFrame {
         noteList.sortAndUpdate();
     }
 
+    @Subscribe
+    public void handleLibraryEvent(LibraryEvent event) {
+        if (event.kind == LibraryEvent.Kind.notebookListChanged) {
+            notebooks.refresh();
+        }
+    }
 }

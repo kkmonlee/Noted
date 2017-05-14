@@ -38,6 +38,39 @@ public class Notebook {
         return folder.equals(f);
     }
 
+    public File folder() {
+        return folder;
+    }
+
+    public static Notebook newNotebook() throws IOException {
+        String baseName = Library.getInstance().getHome() + File.separator + "New notebook";
+        File f = new File(baseName);
+        int n = 2;
+        while (f.exists()) {
+            f = new File(baseName + " " + n);
+            n++;
+        }
+
+        if (!f.mkdirs()) {
+            throw new IOException();
+        }
+
+        return new Notebook(f);
+    }
+
+    public boolean rename(String s) {
+        File newFile = new File(folder.getParentFile() + File.separator + s);
+        try {
+            if (folder.renameTo(newFile)) {
+                folder = newFile;
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public void sortNotes() {
         notes.sort((o1, o2) -> o1.lastModified() > o2.lastModified() ? -1 : 1);
     }
