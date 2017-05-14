@@ -138,7 +138,7 @@ public class NoteEditor extends Background implements CustomEditor.EditorEventLi
             }
 
             if (changed) {
-                window.updateThumb(currentNote);
+                Noted.eventBus.post(new NoteChangedEvent(currentNote));
                 if (contentChanged) {
                     window.sortAndUpdate();
                 }

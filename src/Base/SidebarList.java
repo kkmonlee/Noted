@@ -1,7 +1,9 @@
 package Base;
 
 import Core.Library;
+import Core.Note;
 import IO.IOUtil;
+import com.google.common.eventbus.Subscribe;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,29 +72,46 @@ public class SidebarList extends JPanel {
 
     class SidebarListItem extends JPanel {
         private static final long serialVersionUID = -1786795327565836884L;
+
+        File file;
         private Icon icon;
-        private String label;
         String target;
+        JLabel label;
+
+        @Subscribe
+        public void handleNoteChanged(NoteChangedEvent event) {
+            if (event.note.equals(file)) {
+                refresh();
+            }
+        }
+
+        public void refresh() {
+            if (file.isDirectory()) {
+                icon = Icon.notebookSmall;
+                label.setText(file.getName());
+            } else {
+                icon = Icon.noteSmall;
+                Note note = new Note(file);
+                label.setText(note.getMeta().title());
+            }
+        }
 
         public SidebarListItem(String targetFileName) {
             setOpaque(false);
 
+            Noted.eventBus.register(this);
+
             String path = Library.getInstance().getHome() + File.separator + targetFileName;
 
-            File f = new File(path);
-            if (f.isDirectory()) {
-                icon = Icon.notebookSmall;
-            } else {
-                icon = Icon.noteSmall;
-            }
+            file = new File(path);
+            target = file.getAbsolutePath();
 
-            target = f.getAbsolutePath();
-            label = f.getName();
+            label = new JLabel("");
+            label.setForeground(Color.LIGHT_GRAY);
+            label.setFont(Window.fontBoldNormal);
+            add(label);
 
-            final JLabel l = new JLabel(label);
-            l.setForeground(Color.LIGHT_GRAY);
-            l.setFont(Window.fontBoldNormal);
-            add(l);
+            refresh();
 
             addMouseListener(new MouseListener() {
                 @Override
@@ -102,12 +121,12 @@ public class SidebarList extends JPanel {
 
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    l.setForeground(Color.WHITE);
+                    label.setForeground(Color.WHITE);
                 }
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
-                    l.setForeground(Color.LIGHT_GRAY);
+                    label.setForeground(Color.LIGHT_GRAY);
                 }
 
                 @Override

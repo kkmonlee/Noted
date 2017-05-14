@@ -3,6 +3,7 @@ package Base;
 import Core.Library;
 import Core.Note;
 import Core.Notebook;
+import com.google.common.eventbus.Subscribe;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -58,6 +59,8 @@ public class Window extends JFrame {
     public Window() {
         setTitle("Base.Noted " + VERSION);
         setSize(1080, 1050);
+
+        Noted.eventBus.register(this);
 
         createMenu();
         createSplit();
@@ -183,8 +186,9 @@ public class Window extends JFrame {
         noteEditor.unfocus();
     }
 
-    public void updateThumb(Note note) {
-        noteList.updateThumb(note);
+    @Subscribe
+    public void handleNoteChanged(NoteChangedEvent event) {
+        noteList.updateThumb(event.note);
     }
 
     enum Modes {
